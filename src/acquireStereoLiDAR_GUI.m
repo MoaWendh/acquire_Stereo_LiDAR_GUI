@@ -104,6 +104,10 @@ function pbAbrirAsCameras_Callback(hObject, eventdata, handles)
 % device câmera.
 % Abre e cria um objeto para acessar as câmeras:
 
+% Mensagem inicial:
+msg= sprintf(' Abrindo as câmeras...\n Se demorar mais que 10 seg. pode ser que tenha ocorrido um problema.');
+handles.editMsgs.String= msg;
+
 [handles.camObj handles.paramCamHW]= fOpenCam();
 
 if (handles.camObj(1).DeviceID)
@@ -377,6 +381,10 @@ function pbAbreLidar_Callback(hObject, eventdata, handles)
 % hObject    handle to pbAbreLidar (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+% Mensagem inicial:
+msg= sprintf(' Abrindo LiDAR Puck Lite...\n Se demorar mais que 5 seg. pode ser que tenha ocorrido um problema.');
+handles.editMsgs.String= msg;
 
 % Abre o device LiDAR VPL-16:
 handles.lidar.lidar= velodynelidar(handles.lidar.Model, 'Timeout', handles.lidar.Timeout);
