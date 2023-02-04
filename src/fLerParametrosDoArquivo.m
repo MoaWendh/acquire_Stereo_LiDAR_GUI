@@ -8,17 +8,19 @@
 % Esta função retorna os parâmetros que estão gravados no arquivo "*.dat"
 %*************************************************************************
 function handles = fLerParametrosDoArquivo(handles)
-    handles.numParams= 13;
-    
-    [handles.nameFileParam handles.pathFileParam]= uigetfile('\*.dat');
+handles.numParams= 13;
+
+[handles.nameFileParam handles.pathFileParam]= uigetfile('\*.dat');
+
+if (handles.nameFileParam~= 0)
     fullPath= fullfile( handles.pathFileParam, handles.nameFileParam);    
     fileID=fopen(fullPath,'r');
     
     if (fileID==-1)
         strA= sprintf(' Erro ao abrir arquivo %s -> Código do erro = %d\n', handles.pathFileParam, fileID);
         strB= sprintf(' Possivelmente inexistente ou nome errado!!!!!');
-        msg= string([strA strB]);
-        msgBox(msg);
+        handles.msg= sprintf(' %s \n %s \n', strA, strB);        
+        handles.ArquivoParamLido= 0;
         
         % Criando uma struct com os parâmetros genéricos!!!
         handles.paramFile.Fabricante      = '???';
@@ -45,16 +47,16 @@ function handles = fLerParametrosDoArquivo(handles)
                 linha{ctParam} = regexp(linhaAux,'\s','split');
             else
                 if (ctParam== handles.numParams + 1)
-                    msg3= sprintf('Ok!! Arquivo "%s" gravado com %d parâmetros.\n',handles.pathFileParam, handles.numParams);
-                    disp(msg3); % Arquivo Ok!!!
+                    handles.msg= sprintf('Ok!! Arquivo "%s" gravado com %d parâmetros.\n', handles.pathFileParam, handles.numParams);
                     handles.ArquivoParamLido= 1;
                     break;
                 else 
-                    strA= sprintf('Arquivo %s com número de parâmetros diferente de %d.\n',handles.pathFileParam, handles.numParams);
-                    strB= sprintf('Verifique se o Arquivo %s está corrompido.\n',handles.pathFileParam);
+                    strA= sprintf('Arquivo %s com número de parâmetros diferente de %d.\n', handles.pathFileParam, handles.numParams);
+                    strB= sprintf('Verifique se o Arquivo %s está corrompido.\n', handles.pathFileParam);
                     strC= sprintf('Tente gravar novamente pelo mainMenu.\n');
-                    msg= string([ strA strB strC]); % Arquivo com problemas!!!
-                    msgBox(msg);
+                    handles.msg= sprintf(' %s \n %s \n %s \n', strA, strB, strC);
+                    
+                    handles.ArquivoParamLido= 0;
                     break;
                 end
             end
@@ -95,5 +97,9 @@ function handles = fLerParametrosDoArquivo(handles)
             handles.paramFile.TriggerDelayMode= '???';
             handles.paramFile.TriggerParameter= -100;       
         end             
-    end  
+    end 
+else
+    strA= sprintf(' Arquivo de parâmetros não foi aberto.\n  Operação de abertura de arquivo foi cancelada.');
+    handles.msg= sprintf(' %s \n', strA);   
+end
 end

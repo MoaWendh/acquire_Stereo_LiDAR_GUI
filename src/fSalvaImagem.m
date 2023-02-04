@@ -28,11 +28,9 @@ for (i=1:length(handles.camObj))
     imageCap= getsnapshot(handles.camObj(i));
     % Salva a imagem:
     imwrite(imageCap, fullPath);   
-    fprintf('Imagem %s salva em: %s: \n', nameFile, fullPath);   
-    fprintf('\n');
 end
 
-handles.msg= sprintf(' Foram salvas as PCs:\n - %s\n - %s', fullPathL, fullPathR);
+handles.msg= sprintf(' Foram salvas As imagens: \n -> %s\n -> %s', fullPathL, fullPathR);
 
 % Atualiza o contador de imagens salvas:
 handles.ctCapture= ct;

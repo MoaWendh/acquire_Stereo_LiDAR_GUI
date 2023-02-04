@@ -22,7 +22,7 @@ function varargout = acquireStereoLiDAR_GUI(varargin)
 
 % Edit the above text to modify the response to help acquireStereoLiDAR_GUI
 
-% Last Modified by GUIDE v2.5 03-Feb-2023 18:08:57
+% Last Modified by GUIDE v2.5 04-Feb-2023 10:36:14
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -107,13 +107,20 @@ function pbAbrirAsCameras_Callback(hObject, eventdata, handles)
 [handles.camObj handles.paramCamHW]= fOpenCam();
 
 if (handles.camObj(1).DeviceID)
-    handles.pbShowParamCams.Enable= 'on';
-    handles.pbConfigCams.Enable= 'on';
+    if (handles.ArquivoParamLido)
+        handles.pbConfigCams.Enable= 'on';
+    else
+        handles.pbConfigCams.Enable= 'off';        
+    end
+    
+    handles.pbShowParamCams.Enable= 'on';        
     handles.pbTesteCapturaImages.Enable= 'on';
     handles.camObjStarted= 1;
     msg= sprintf('Foram criados %d objetos para os devices:\n - Câmera: %s\n - Câmera: %s', ...
                 length(handles.camObj), handles.paramCamHW(1).deviceModel, handles.paramCamHW(2).deviceModel);
-    handles.editMsgs.String= msg;    
+    handles.editMsgs.String= msg;
+    handles.staticCameras.String= 'Cameras ok.';
+    handles.staticCameras.ForegroundColor= [0, 0.6, 0];
 else
     handles.camObjStarted= 0;
     handles.pbShowParamCams.Enable= 'off';
@@ -164,15 +171,26 @@ function pbLerParamFiles_Callback(hObject, eventdata, handles)
 % parâmetros desejados no ensaio:
 handles= fLerParametrosDoArquivo(handles);
 
-if handles.ArquivoParamLido 
-    msg= sprintf('Ok! Parâmetros lidos do arquivo.');
-    handles.editMsgs.String= msg;
+if (handles.ArquivoParamLido)
+    if (handles.camObjStarted)
+        handles.pbConfigCams.Enable= 'on';
+    else
+        handles.pbConfigCams.Enable= 'off';        
+    end
+    
+    handles.pbExibeParamFiles.Enable= 'on';
+    handles.editMsgs.String= handles.msg;
+    handles.staticLerArquivoParam.String= 'Arquivo parâmetros ok.';
+    handles.staticLerArquivoParam.ForegroundColor= [0.0, 0.6, 0.0];   
     
     % Exibe os prâmetros lidos do arquivo de dados:
     fShowParamFile(handles);
 else
-    msg= sprintf(' Problemas ao ler arquivos de parâmetros.\n Verifique se o arquivo não está corrompido!');
-    msgbox(msg, 'Atenção!', 'warn');
+    handles.pbExibeParamFiles.Enable= 'off';
+    msgbox(handles.msg, 'Atenção!', 'warn');
+    
+    handles.staticLerArquivoParam.String= 'Arquivo não lido.';
+    handles.staticLerArquivoParam.ForegroundColor= [1, 0.0, 0.0];
 end
 
 % Update handles structure
@@ -201,10 +219,10 @@ function pbConfigCams_Callback(hObject, eventdata, handles)
 % Chama função para gravar os parãmetros do arquivo na câmera:
 if handles.ArquivoParamLido 
     fGravarParametrosNaCamera(handles);
-    msg= sprintf('Ok! Parâmetros gravados nas câmeras.');
+    msg= sprintf(' Parâmetros gravados nas câmeras.');
     handles.editMsgs.String= msg;
 else
-    msg= sprintf('Primeiro carregue os arquivos de dados. ');
+    msg= sprintf(' Primeiro carregue os arquivos de dados. ');
     msgbox(msg, 'Atenção!', 'warn');
 end
 
@@ -245,7 +263,7 @@ function pbPreviewParEstereo_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Abre um stream das duas câmeras. 
-fShowPreview(handles);
+fShowPreviewStereo(handles);
 
 
 
@@ -274,6 +292,18 @@ function pbPathSaveImages_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 handles= fGeraPaths(handles);
+
+if (handles.pathsGerados)
+    handles.staticPaths.String= 'Paths ok.';
+    handles.staticPaths.ForegroundColor= [0.0, 0.6, 0.0];
+else
+    handles.staticPaths.String= handles.msg;
+    handles.staticPaths.ForegroundColor= [1, 0.0, 0.0];   
+    
+    MsgBox= msgbox(handles.msg);
+    uiwait(MsgBox);
+end
+
 
 % Se a câmera também está aberta, o botão de preview da câmera e liDAR,
 % simultâneo, será habilitado
@@ -304,7 +334,7 @@ if (handles.pathsGerados)
         handles= fSalvaImagem(handles);
         
         % Salva a nuvem de pontos do LiDAR:
-        fCapturaSalvaNuvemDePontos(handles);
+        handles= fCapturaSalvaNuvemDePontos(handles);
     else
         msg= sprintf(' As câmeras não foram abertas ainda.\n Primeiro crie os objetos das câmeras.!');
         msgbox(msg, 'Atenção!', 'warn') 
@@ -351,8 +381,20 @@ function pbAbreLidar_Callback(hObject, eventdata, handles)
 % Abre o device LiDAR VPL-16:
 handles.lidar.lidar= velodynelidar(handles.lidar.Model, 'Timeout', handles.lidar.Timeout);
 
+%Pega os parâmetros do LiDAR:
+model= handles.lidar.lidar.Model;
+IP= handles.lidar.lidar.IPAddress;
+port= handles.lidar.lidar.Port;
+pathCalibFile= handles.lidar.lidar.CalibrationFile;
+
+msg= sprintf('LiDAR %s Aberto:\n -> IP Address: %s\n -> Port: %d\n -> Calib file:\n %s', model, IP, port, pathCalibFile);
+handles.editMsgs.String= msg;
+
 % Flag que sinaliza que o LiDAR foi aberto e tem um objeto criado para ele: 
 handles.Lidar.LidarStarted= 1;
+
+handles.staticLidar.String= 'LiDAR ok.';
+handles.staticLidar.ForegroundColor= [0, 0.6, 0];
 
 % Se a câmera também está aberta, o botão de preview da câmera e liDAR,
 % simultâneo, será habilitado
@@ -374,17 +416,15 @@ function pbPreviewLidar_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-%Define os limites dos eixos XYZ:
-xLim= [-2 2] ;
-yLim= [0 5];
-zLim= [-1 1];
+% Chama função que exibe o preview do LiDAR:
+fShowPreviewLidar(handles);
 
-% Abre preview do LiDAR:
-preview(handles.lidar.lidar, xLim, yLim, zLim);  
 
-msg= sprintf('Pressione OK Para sair do preview.');
-figureBox= msgbox(msg);
-uiwait(figureBox);
+% --- Executes on button press in pbExibeParamFiles.
+function pbExibeParamFiles_Callback(hObject, eventdata, handles)
+% hObject    handle to pbExibeParamFiles (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
-% Fecha o preview do LiDAR:
-closePreview(handles.lidar.lidar);
+% Exibe os prâmetros previamente defindos em arquivo:
+fShowParamFile(handles); 

@@ -1,4 +1,4 @@
-function fshowPreview(handles)
+function fShowPreviewStereo(handles)
    
     f1=figure;  
     f1.Name= 'Preview par estéreo';
