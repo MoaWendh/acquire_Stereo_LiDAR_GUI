@@ -47,15 +47,13 @@ if (handles.nameFileParam~= 0)
                 linha{ctParam} = regexp(linhaAux,'\s','split');
             else
                 if (ctParam== handles.numParams + 1)
-                    handles.msg= sprintf('Ok!! Arquivo "%s" gravado com %d parâmetros.\n', handles.pathFileParam, handles.numParams);
+                    handles.msg= sprintf('Foram lidos %d parâmetros do arquivo de dados: \n "%s"', handles.numParams, fullPath);
                     handles.ArquivoParamLido= 1;
                     break;
                 else 
-                    strA= sprintf('Arquivo %s com número de parâmetros diferente de %d.\n', handles.pathFileParam, handles.numParams);
-                    strB= sprintf('Verifique se o Arquivo %s está corrompido.\n', handles.pathFileParam);
-                    strC= sprintf('Tente gravar novamente pelo mainMenu.\n');
-                    handles.msg= sprintf(' %s \n %s \n %s \n', strA, strB, strC);
-                    
+                    strA= sprintf('Arquivo: \n "%s" \n com número de parâmetros diferente de %d.\n', fullPath, handles.numParams);
+                    strB= sprintf('Verifique se o Arquivo "%s" está corrompido.\n', handles.nameFileParam);
+                    handles.msg= sprintf(' %s \n %s \n', strA, strB);                    
                     handles.ArquivoParamLido= 0;
                     break;
                 end
