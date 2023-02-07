@@ -22,7 +22,7 @@ function varargout = acquireStereoLiDAR_GUI(varargin)
 
 % Edit the above text to modify the response to help acquireStereoLiDAR_GUI
 
-% Last Modified by GUIDE v2.5 07-Feb-2023 20:46:18
+% Last Modified by GUIDE v2.5 07-Feb-2023 17:10:23
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -307,9 +307,9 @@ clear;
 close all;
 
 
-% --- Executes on button press in pbDefinePathsToSave.
-function pbDefinePathsToSave_Callback(hObject, eventdata, handles)
-% hObject    handle to pbDefinePathsToSave (see GCBO)
+% --- Executes on button press in pbPathSaveImages.
+function pbPathSaveImages_Callback(hObject, eventdata, handles)
+% hObject    handle to pbPathSaveImages (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 handles= fGeraPaths(handles);
@@ -317,7 +317,7 @@ handles= fGeraPaths(handles);
 if (handles.pathsGerados)
     handles.staticPaths.String= 'Ok.';
     handles.staticPaths.ForegroundColor= [0.0, 0.6, 0.0];
-    MsgBox= msgbox(handles.msg);
+    MsgBox= msgbox(handles.msg, 'Success');
     uiwait(MsgBox);
 else
     handles.staticPaths.String= 'Indefinido';
@@ -472,11 +472,8 @@ val= str2double(hObject.String);
 if (val>0.3)
     handles.Delay= val;
 else
-   msg= sprintf('O valor mínimo aceito para o delay é de 300 ms. Escolha um valor superior'); 
-   msgbox(msg);
-   hObject.String= '0.3';
+   msg= sprintf('O valor mínimo aceito para o delay é de 0'); 
 end
-
 % Update handles structure
 guidata(hObject, handles);
 

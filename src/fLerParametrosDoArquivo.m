@@ -10,7 +10,7 @@
 function handles = fLerParametrosDoArquivo(handles)
 handles.numParams= 13;
 
-[handles.nameFileParam handles.pathFileParam]= uigetfile('\*.dat');
+[handles.nameFileParam handles.pathFileParam]= uigetfile('C:\Projetos\Matlab\Experimentos\Calibracao\*.dat');
 
 if (handles.nameFileParam~= 0)
     fullPath= fullfile( handles.pathFileParam, handles.nameFileParam);    
