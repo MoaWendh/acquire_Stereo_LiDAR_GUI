@@ -30,10 +30,9 @@ for (i=1:length(handles.camObj))
     imwrite(imageCap, fullPath);   
 end
 
-msg= sprintf('Foi salva a imagem %s em:\n -> %s \nFoi salva a imagem %s em:\n -> %s', ...
-    nameFileL, handles.param.pathToSaveImagesL, nameFileR, handles.param.pathToSaveImagesR);
+msg= sprintf('Foi salva a imagem %s em:\n -> %s \nFoi salva a imagem %s em:\n -> %s', nameFileL, handles.param.pathToSaveImagesL);
 
-handles.msg= msg;
+handles.msg= sprintf('Foram salvas As imagens: \n -> %s\n -> %s', fullPathL, fullPathR);
 
 % Atualiza o contador de imagens salvas:
 handles.ctCapture= ct;
